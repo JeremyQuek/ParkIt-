@@ -1,5 +1,3 @@
-Student Club Database
-
 CREATE TABLE clubs (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
