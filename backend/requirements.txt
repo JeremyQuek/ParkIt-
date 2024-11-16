@@ -1,8 +1,7 @@
 flask
 flask-cors
 
-dotenv
+python-dotenv
 psutil
 
-redis
-sqlite3
+groq

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
@@ -8,7 +8,6 @@ import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import { useCookies } from "react-cookie";
 import {
-  Container,
   List,
   ListItem,
   ListItemText,
@@ -16,6 +15,9 @@ import {
   Button,
   IconButton,
 } from "@mui/material";
+import { DeleteOutline } from "@mui/icons-material";
+import { IoNavigate } from "react-icons/io5";
+import "./style.css";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 const backend_url = process.env.REACT_APP_BACKEND_URL;
@@ -26,6 +28,7 @@ const Bookmarks = () => {
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [cookies] = useCookies(["user"]);
   const uid = cookies.user;
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (map.current) return;
@@ -35,12 +38,10 @@ const Bookmarks = () => {
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/mapbox/streets-v12",
       center: [103.8198, 1.3521],
       zoom: 11,
     });
-
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     const geolocate = new mapboxgl.GeolocateControl({
       positionOptions: {
@@ -48,18 +49,21 @@ const Bookmarks = () => {
       },
       trackUserLocation: true,
     });
-    map.current.addControl(geolocate);
-
-    map.current.on("load", () => {
-      geolocate.trigger();
-    });
 
     const geocoder = new MapboxGeocoder({
       accessToken: mapboxgl.accessToken,
       mapboxgl: mapboxgl,
       placeholder: "Enter destination",
+      className: "custom-geocoder",
     });
+
     map.current.addControl(geocoder);
+    map.current.addControl(geolocate);
+    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+    map.current.on("load", () => {
+      geolocate.trigger();
+    });
 
     geocoder.on("result", (e) => {
       setSelectedLocation({
@@ -74,11 +78,12 @@ const Bookmarks = () => {
 
     try {
       console.log(selectedLocation);
-      await axios.post(backend_url + "/bookmarks/add", {
+      let resp = await axios.post(backend_url + "/bookmarks/add", {
         uid: uid,
         location: selectedLocation.name,
         coordinates: selectedLocation.coordinates,
       });
+      console.log(resp);
       setBookmarks((prevBookmarks) => [
         ...prevBookmarks,
         [
@@ -87,9 +92,11 @@ const Bookmarks = () => {
           selectedLocation.coordinates[1],
         ],
       ]);
-      setSelectedLocation(null);
     } catch (error) {
       console.error("Error adding bookmark:", error);
+      console.log(error.response);
+    } finally {
+      setSelectedLocation(null);
     }
   };
 
@@ -124,64 +131,83 @@ const Bookmarks = () => {
     }
   };
 
+  const handleNavigate = (coordinates) => {
+    navigate("/navigation", {
+      state: {
+        coordinates: coordinates,
+        timestamp: Date.now(), // Add a timestamp to force state update
+      },
+      replace: true, // Use replace to enable proper back button behavior
+    });
+  };
+
   return (
-    <Container>
-      <div className="page">
-        <div
-          className="top-bar"
+    <div className="page" style={{ background: "#fcfcfc" }}>
+      <div
+        className="top-bar"
+        style={{
+          position: "relative",
+        }}
+      >
+        <IconButton
+          component={Link}
+          to="/navigation"
+          edge="start"
+          color="inherit"
+          aria-label="back"
           style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            position: "absolute",
+            left: 10,
           }}
         >
-          <IconButton
-            component={Link}
-            to="/navigation"
-            edge="start"
-            color="inherit"
-            aria-label="back"
-          >
-            <IoIosArrowBack size={24} />
-          </IconButton>
-          <h1>Bookmarks</h1>
-        </div>
-        <div
-          className="mapContainer"
-          ref={mapContainer}
-          style={{ height: "300px", marginBottom: "16px" }}
-        />
-
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={addBookmark}
-          disabled={!selectedLocation}
-        >
-          {selectedLocation
-            ? `Add "${selectedLocation.name}" to Bookmarks`
-            : "Search for a location with map"}
-        </Button>
-
-        <Divider style={{ margin: "16px 0" }} />
-
-        <h3>My Bookmarks</h3>
-        <List>
-          {bookmarks.map((bookmark, index) => (
-            <ListItem key={index}>
-              <ListItemText primary={bookmark[0]} />
-              {console.log(bookmark)}
-              <Button
-                color="secondary"
-                onClick={() => deleteBookmark(bookmark)}
-              >
-                Delete
-              </Button>
-            </ListItem>
-          ))}
-        </List>
+          <IoIosArrowBack size={24} />
+        </IconButton>
+        <h1 style={{ textAlign: "center" }}>Bookmarks</h1>
       </div>
-    </Container>
+      <div
+        className="mapContainer"
+        ref={mapContainer}
+        style={{ height: "300px", marginBottom: "16px" }}
+      />
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={addBookmark}
+        disabled={!selectedLocation}
+      >
+        {selectedLocation
+          ? `Add "${selectedLocation.name}" to Bookmarks`
+          : "Search for a location with map"}
+      </Button>
+      <Divider style={{ margin: "16px 0" }} />
+      <h3>
+        <br />
+        My Bookmarks
+      </h3>
+      <List className="bookmark-list">
+        {bookmarks.map((bookmark, index) => (
+          <React.Fragment key={index}>
+            <ListItem button className="bookmark-box">
+              <ListItemText primary={bookmark[0]} />
+              <IconButton
+                onClick={() => handleNavigate([bookmark[1], bookmark[2]])}
+                sx={{ color: "#1976d2" }}
+              >
+                <IoNavigate />
+              </IconButton>
+              <IconButton
+                edge="end"
+                onClick={() => deleteBookmark(bookmark)}
+                color="error"
+              >
+                <DeleteOutline />
+              </IconButton>
+            </ListItem>
+          </React.Fragment>
+        ))}
+      </List>
+    </div>
   );
 };
 
