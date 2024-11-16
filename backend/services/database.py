@@ -106,7 +106,7 @@ def main():
         desired_headers = ['agency', 'carpark_id', 'address', 'lat', 'long',
                          'price', 'price_weekend', 'EV']
 
-        csv_file_path = '/Users/jeremyquek/Desktop/Projects/app projects/ParkIt_App/backend/assets/CarparkInformation_final.csv'
+        csv_file_path = './backend/assets/CarparkInformation_final.csv'
         data = []
 
         with open(csv_file_path, mode='r') as file:

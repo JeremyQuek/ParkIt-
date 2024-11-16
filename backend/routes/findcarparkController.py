@@ -32,28 +32,30 @@ def carparkfinder():
 
     destination = (lat, lon)
 
+    for
+
     res = sort_by_dist(destination, carpark_data)
-    update_result_with_HDB_lots(res)
-    update_result_with_LTA_lots(res)
+    # update_result_with_HDB_lots(res)
+    # update_result_with_LTA_lots(res)
 
-    sort_options = requests.get(BACKEND_URL + "sort").json()
-    sort_type = sort_options["sort_type"]
-    show_ev = sort_options["show_ev"]
-    veh_type=sort_options["veh_type"]
+    # sort_options = requests.get(BACKEND_URL + "sort").json()
+    # sort_type = sort_options["sort_type"]
+    # show_ev = sort_options["show_ev"]
+    # veh_type=sort_options["veh_type"]
 
-    if show_ev == "false":
-        for carpark in res:
-            carpark["EV"] = 0
+    # if show_ev == "false":
+    #     for carpark in res:
+    #         carpark["EV"] = 0
 
-    if sort_type == "price":
-            sort_by_price(res)
-    elif sort_type == "lots":
-            sort_by_lots(res)
+    # if sort_type == "price":
+    #         sort_by_price(res)
+    # elif sort_type == "lots":
+    #         sort_by_lots(res)
 
-    if veh_type == "motorcycle":
-         for carpark in res:
-            carpark["lot_type"]="M"
-            carpark["price"]= "$0.65/hr" if carpark["agency"] == "HDB" else carpark["price"]
+    # if veh_type == "motorcycle":
+    #      for carpark in res:
+    #         carpark["lot_type"]="M"
+    #         carpark["price"]= "$0.65/hr" if carpark["agency"] == "HDB" else carpark["price"]
 
     return jsonify({
             "status": "success",
