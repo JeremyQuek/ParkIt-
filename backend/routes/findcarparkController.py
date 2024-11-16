@@ -32,8 +32,6 @@ def carparkfinder():
 
     destination = (lat, lon)
 
-    for
-
     res = sort_by_dist(destination, carpark_data)
     # update_result_with_HDB_lots(res)
     # update_result_with_LTA_lots(res)
