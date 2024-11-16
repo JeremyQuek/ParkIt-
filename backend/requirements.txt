@@ -7,3 +7,5 @@ psutil
 groq
 gunicorn
 requests
+
+psycopg2
