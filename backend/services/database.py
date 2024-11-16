@@ -3,7 +3,7 @@ import psycopg2
 import csv
 import os
 from psycopg2 import Error
-
+import random
 load_dotenv()
 DB_PARAMS = {
     'dbname': os.getenv('DB_NAME'),
@@ -92,6 +92,127 @@ def populate_carparks(data, conn):
     finally:
         if cur:
             cur.close()
+
+
+def check_user(uid):
+    """Check if a user exists in the database"""
+    conn = open_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE user_id = %s", (str(uid),))
+        res = cur.fetchone()
+        return bool(res)
+    except Error as e:
+        print(f"Error checking user: {e}")
+        return False
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+def insert_bookmark(uid: str, name: str, loc: str, coords: list):
+    """Insert a new bookmark"""
+    conn = open_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO bookmarks (user_id, name, location, lat, long)
+            VALUES ((SELECT id FROM users WHERE user_id = %s), %s, %s, %s, %s)
+        """, (uid, name, loc, coords[0], coords[1]))
+        conn.commit()
+        return True
+    except psycopg2.IntegrityError as e:
+        print(f"IntegrityError: {e}")
+        return False
+    except Error as e:
+        print(f"Error inserting bookmark: {e}")
+        return False
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+def delete_bookmark(uid: str, loc: str):
+    """Delete a bookmark"""
+    conn = open_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            DELETE FROM bookmarks
+            WHERE user_id = (SELECT id FROM users WHERE user_id = %s)
+            AND location = %s
+        """, (uid, loc))
+        conn.commit()
+        return True
+    except Error as e:
+        print(f"Error deleting bookmark: {e}")
+        return False
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+def retrieve_bookmarks(uid: str):
+    """Retrieve all bookmarks for a user"""
+    conn = open_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT name, location, lat, long
+            FROM bookmarks
+            WHERE user_id = (SELECT id FROM users WHERE user_id = %s)
+        """, (uid,))
+        return cur.fetchall()
+    except Error as e:
+        print(f"Error retrieving bookmarks: {e}")
+        return []
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+def create_db():
+    """Create all necessary tables if they don't exist"""
+    conn = open_connection()
+    try:
+        cur = conn.cursor()
+
+        # Create users table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                user_id VARCHAR(10) NOT NULL UNIQUE
+            )
+        """)
+
+        # Create bookmarks table
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS bookmarks (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                name VARCHAR(255) NOT NULL,
+                location VARCHAR(255) NOT NULL,
+                lat VARCHAR(100) NOT NULL,
+                long VARCHAR(100) NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                UNIQUE (user_id, location)
+            )
+        """)
+
+        conn.commit()
+        print("Database tables created successfully")
+    except Error as e:
+        print(f"Error creating database: {e}")
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
 def main():
     # Connect to database
     conn = open_connection()
@@ -106,7 +227,7 @@ def main():
         desired_headers = ['agency', 'carpark_id', 'address', 'lat', 'long',
                          'price', 'price_weekend', 'EV']
 
-        csv_file_path = './backend/assets/CarparkInformation_final.csv'
+        csv_file_path = './assets/CarparkInformation_final.csv'
         data = []
 
         with open(csv_file_path, mode='r') as file:
@@ -162,6 +283,28 @@ def retrieve_carparks():
     finally:
         if cur:
             cur.close()
+
+def create_user():
+    conn = open_connection()
+    try:
+        cur = conn.cursor()
+        while True:
+            number = random.randint(10**9, 10**10 - 1)
+            cur.execute("SELECT COUNT(*) FROM users WHERE user_id = %s", (str(number),))
+            if cur.fetchone()[0] == 0:
+                cur.execute("INSERT INTO users (user_id) VALUES (%s)", (str(number),))
+                conn.commit()
+                break
+        return number
+    except Exception as e:
+        print(f"Error creating user: {e}")
+        return None
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
 
 if __name__ == "__main__":
     main()

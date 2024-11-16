@@ -31,7 +31,7 @@ def get_bookmarks():
 def add_bookmarks():
     data = request.get_json()
     print(data)
-    resp = db.insert_bookmark(data.get("uid"), data.get("location"), data.get("coordinates"))
+    resp = db.insert_bookmark(data.get("uid"), data.get("name"),data.get("location"), data.get("coordinates"))
     if resp is None:
         # Successful insertion
         return jsonify({"message": "Bookmark created successfully"}), 201
@@ -41,7 +41,7 @@ def add_bookmarks():
     else:
         # Unexpected error (optional)
         return jsonify({"message": "An unexpected error occurred"}), 500
-    
+
 @bookmarks_bp.route("/bookmarks/delete", methods=["POST"])
 def remove_bookmarks():
     data = request.get_json()
