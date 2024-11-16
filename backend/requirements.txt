@@ -6,3 +6,4 @@ psutil
 
 groq
 gunicorn
+requests
