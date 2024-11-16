@@ -12,7 +12,7 @@ import "./index.css";
 
 function App() {
   const [cookies, setCookie, removeCookie] = useCookies(["user"]);
-  const backend_url = "http://127.0.0.1:5000";
+  const backend_url = process.env.REACT_APP_BACKEND_URL;
   const fetchCalled = useRef(false);
   let registerUID = async () => {
     try {

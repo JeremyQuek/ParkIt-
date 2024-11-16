@@ -273,3 +273,12 @@
     background-color: #1976d2;
     box-shadow: 0 0 10px rgba(25, 118, 210, 0.3);
 }
+
+.dialog-transition-enter {
+    transform: translateY(100%);
+}
+
+.dialog-transition-enter-active {
+    transform: translateY(0);
+    transition: transform 300ms ease-out;
+}
