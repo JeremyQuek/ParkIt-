@@ -116,15 +116,13 @@ def insert_bookmark(uid: str, name: str, loc: str, coords: list):
     conn = open_connection()
     try:
         cur = conn.cursor()
+        # Can directly use uid now since foreign key links to users.user_id
         cur.execute("""
             INSERT INTO bookmarks (user_id, name, location, lat, long)
-            VALUES ((SELECT id FROM users WHERE user_id = %s), %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s)
         """, (uid, name, loc, coords[0], coords[1]))
         conn.commit()
         return True
-    except psycopg2.IntegrityError as e:
-        print(f"IntegrityError: {e}")
-        return False
     except Error as e:
         print(f"Error inserting bookmark: {e}")
         return False

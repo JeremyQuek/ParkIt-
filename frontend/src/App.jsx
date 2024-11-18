@@ -19,18 +19,19 @@ function App() {
       await axios
         .get(backend_url + "/user")
         .then((res) => {
-          console.log("uid");
-          console.log(res.data);
+          if (res.status === 200) {
+            console.log("✅ New user created successfully:", res.data);
+          }
           setCookie("user", res.data, {
             path: "/",
             maxAge: 3155760000,
             sameSite: "Lax",
             secure: false,
-          }); // 100 years
+          });
         })
-        .catch((err) => console.error(err));
+        .catch((err) => console.error("❌ Error creating user:", err));
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("❌ Error fetching data:", error);
     }
   };
 
@@ -41,10 +42,12 @@ function App() {
           params: { uid: uid },
         })
         .then((res) => {
-          console.log(res);
+          if (res.status === 200) {
+            console.log("✅ Existing user found successfully:", uid);
+          }
         });
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("❌ Error checking user:", error);
       removeCookie("user", { path: "/" });
       registerUID();
     }
