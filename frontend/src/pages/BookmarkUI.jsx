@@ -281,7 +281,7 @@ const Bookmarks = () => {
             margin: "16px",
             animation: "slideUp 300ms ease-out",
             maxHeight: "100%",
-            width: "100%",
+            width: "390px",
             overflow: "hidden",
           },
         }}
