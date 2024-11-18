@@ -64,7 +64,7 @@ const Bookmarks = () => {
       accessToken: mapboxgl.accessToken,
       mapboxgl: mapboxgl,
       placeholder: "Enter destination",
-      className: "custom-geocoder",
+      className: "bookmark-geocoder",
     });
 
     map.current.addControl(geocoder);
@@ -281,7 +281,7 @@ const Bookmarks = () => {
             margin: "16px",
             animation: "slideUp 300ms ease-out",
             maxHeight: "100%",
-            width: "450px",
+            width: "100%",
             overflow: "hidden",
           },
         }}

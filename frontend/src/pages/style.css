@@ -47,6 +47,11 @@
     margin-right: 35px !important;
 }
 
+.bookmark-geocoder .mapboxgl-ctrl-geocoder {
+    width: 70% !important;
+    margin: 10px auto !important; /* Centers the search bar */
+}
+
 /* Style the input box */
 .mapboxgl-ctrl-geocoder--input {
     height: 40px !important;
