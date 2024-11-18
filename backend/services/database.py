@@ -21,7 +21,8 @@ def open_connection():
         print(f"Error connecting to PostgreSQL: {e}")
         return None
 
-def create_table(conn):
+
+def create_carpark(conn):
     """Create the carpark table if it doesn't exist"""
     try:
         cur = conn.cursor()
@@ -93,18 +94,71 @@ def populate_carparks(data, conn):
         if cur:
             cur.close()
 
+def retrieve_carparks():
+    conn=open_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM carpark")
+        rows = cur.fetchall()
 
-def check_user(uid):
-    """Check if a user exists in the database"""
+        # Get column names from cursor description
+        columns = [desc[0] for desc in cur.description]
+
+        carpark_dict = {
+            row[1]: {  # carpark_id is at index 1
+                columns[0]: row[0],  # agency
+                columns[1]: row[1],  # carpark_id
+                columns[2]: row[2],  # address
+                columns[3]: row[3],  # lat
+                columns[4]: row[4],  # long
+                columns[5]: row[5],  # price
+                columns[6]: row[6],  # price_weekend
+                columns[7]: row[7]   # ev
+            }
+            for row in rows
+        }
+
+        return carpark_dict
+    except psycopg2.Error as e:
+        print(f"An error occurred while retrieving carparks: {e}")
+        return {}
+    finally:
+        if cur:
+            cur.close()
+
+
+def create_bookmarks():
+    """Create all necessary tables if they don't exist"""
     conn = open_connection()
     try:
         cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE user_id = %s", (str(uid),))
-        res = cur.fetchone()
-        return bool(res)
+
+        # Create users table with SERIAL id
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                user_id VARCHAR(10) UNIQUE NOT NULL
+            )
+        """)
+
+        # Create bookmarks table with integer user_id foreign key
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS bookmarks (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER NOT NULL,
+                name VARCHAR(255) NOT NULL,
+                location VARCHAR(255) NOT NULL,
+                lat VARCHAR(100) NOT NULL,
+                long VARCHAR(100) NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id),
+                UNIQUE (user_id, location)
+            )
+        """)
+
+        conn.commit()
+        print("Database tables created successfully")
     except Error as e:
-        print(f"Error checking user: {e}")
-        return False
+        print(f"Error creating database: {e}")
     finally:
         if cur:
             cur.close()
@@ -116,10 +170,9 @@ def insert_bookmark(uid: str, name: str, loc: str, coords: list):
     conn = open_connection()
     try:
         cur = conn.cursor()
-        # Can directly use uid now since foreign key links to users.user_id
         cur.execute("""
             INSERT INTO bookmarks (user_id, name, location, lat, long)
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES ((SELECT id FROM users WHERE user_id = %s), %s, %s, %s, %s)
         """, (uid, name, loc, coords[0], coords[1]))
         conn.commit()
         return True
@@ -139,7 +192,8 @@ def delete_bookmark(uid: str, loc: str):
         cur = conn.cursor()
         cur.execute("""
             DELETE FROM bookmarks
-            WHERE user_id = %s AND location = %s
+            WHERE user_id = (SELECT id FROM users WHERE user_id = %s)
+            AND location = %s
         """, (uid, loc))
         conn.commit()
         return True
@@ -151,17 +205,17 @@ def delete_bookmark(uid: str, loc: str):
             cur.close()
         if conn:
             conn.close()
+
 def retrieve_bookmarks(uid: str):
     """Retrieve all bookmarks for a user"""
     conn = open_connection()
     try:
         cur = conn.cursor()
-        # Modified query to use user_id directly instead of going through users.id
         cur.execute("""
             SELECT name, location, lat, long
             FROM bookmarks
-            WHERE user_id = %s
-        """, (uid,))  # Direct comparison with user_id
+            WHERE user_id = (SELECT id FROM users WHERE user_id = %s)
+        """, (uid,))
         return cur.fetchall()
     except Error as e:
         print(f"Error retrieving bookmarks: {e}")
@@ -172,42 +226,45 @@ def retrieve_bookmarks(uid: str):
         if conn:
             conn.close()
 
-def create_db():
-    """Create all necessary tables if they don't exist"""
+
+def create_user():
     conn = open_connection()
     try:
         cur = conn.cursor()
-
-        # Create users table
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                user_id VARCHAR(10) PRIMARY KEY
-            )
-        """)
-
-        # Create bookmarks table with user_id as VARCHAR
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS bookmarks (
-                id SERIAL PRIMARY KEY,
-                user_id VARCHAR(10) NOT NULL,
-                name VARCHAR(255) NOT NULL,
-                location VARCHAR(255) NOT NULL,
-                lat VARCHAR(100) NOT NULL,
-                long VARCHAR(100) NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES users(user_id),
-                UNIQUE (user_id, location)
-            )
-        """)
-
-        conn.commit()
-        print("Database tables created successfully")
-    except Error as e:
-        print(f"Error creating database: {e}")
+        while True:
+            number = random.randint(10**9, 10**10 - 1)
+            cur.execute("SELECT COUNT(*) FROM users WHERE user_id = %s", (str(number),))
+            if cur.fetchone()[0] == 0:
+                cur.execute("INSERT INTO users (user_id) VALUES (%s)", (str(number),))
+                conn.commit()
+                break
+        return number
+    except Exception as e:
+        print(f"Error creating user: {e}")
+        return None
     finally:
         if cur:
             cur.close()
         if conn:
             conn.close()
+
+def check_user(uid):
+    """Check if a user exists in the database"""
+    conn = open_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE user_id = %s", (str(uid),))
+        res = cur.fetchone()
+        return bool(res)
+    except Error as e:
+        print(f"Error checking user: {e}")
+        return False
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
 
 def main():
     # Connect to database
@@ -247,60 +304,6 @@ def main():
         if conn:
             conn.close()
             print("Database connection closed")
-
-def retrieve_carparks():
-    conn=open_connection()
-    try:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM carpark")
-        rows = cur.fetchall()
-
-        # Get column names from cursor description
-        columns = [desc[0] for desc in cur.description]
-
-        carpark_dict = {
-            row[1]: {  # carpark_id is at index 1
-                columns[0]: row[0],  # agency
-                columns[1]: row[1],  # carpark_id
-                columns[2]: row[2],  # address
-                columns[3]: row[3],  # lat
-                columns[4]: row[4],  # long
-                columns[5]: row[5],  # price
-                columns[6]: row[6],  # price_weekend
-                columns[7]: row[7]   # ev
-            }
-            for row in rows
-        }
-
-        return carpark_dict
-    except psycopg2.Error as e:
-        print(f"An error occurred while retrieving carparks: {e}")
-        return {}
-    finally:
-        if cur:
-            cur.close()
-
-def create_user():
-    conn = open_connection()
-    try:
-        cur = conn.cursor()
-        while True:
-            number = random.randint(10**9, 10**10 - 1)
-            cur.execute("SELECT COUNT(*) FROM users WHERE user_id = %s", (str(number),))
-            if cur.fetchone()[0] == 0:
-                cur.execute("INSERT INTO users (user_id) VALUES (%s)", (str(number),))
-                conn.commit()
-                break
-        return number
-    except Exception as e:
-        print(f"Error creating user: {e}")
-        return None
-    finally:
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
-
 
 # if __name__ == "__main__":
 #     main()
