@@ -13,8 +13,9 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.2",
+    "compression": "^1.7.4",
+    "express": "^4.17.1",
     "framer-motion": "^10.18.0",
-    "frontend": "file:",
     "lottie-react": "^2.4.0",
     "lottie-web": "^5.12.2",
     "mapbox-gl": "^2.15.0",
@@ -30,8 +31,9 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "node server.js",
+    "dev": "react-scripts start",
+    "build": "react-scripts build && cp server.js build/",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -49,8 +51,11 @@
     ],
     "development": [
       "last 1 chrome version",
-      "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.14.0"
   }
 }
