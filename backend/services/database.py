@@ -1,4 +1,5 @@
 from dotenv.main import load_dotenv
+from utils.performance import measure_time
 import psycopg2
 import csv
 import os
