@@ -42,7 +42,7 @@
 }
 
 .mapboxgl-ctrl-geocoder {
-    width: 130% !important;
+    width: 100% !important;
     margin: 10px !important;
     margin-right: 35px !important;
 }
@@ -241,7 +241,7 @@
     background-color: white;
     height: 200px;
     width: 100%;
-    padding: 20px;
+    padding: 20px 0;
     border-bottom: 3px solid #f1f1f1;
 }
 .settings-icon-box {
