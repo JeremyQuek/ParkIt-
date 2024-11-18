@@ -31,7 +31,7 @@ app.use(compression());
 // Serve static files from React build
 app.use(
   express.static(path.join(__dirname, "build"), {
-    maxAge: "1y", // Cache static assets for 1 year
+    maxAge: "1y",
     etag: true,
   }),
 );
@@ -51,11 +51,15 @@ app.get("/health", (req, res) => {
 
 // Handle React routing
 app.get("*", (req, res, next) => {
-  // Don't serve index.html for API routes
   if (req.url.startsWith("/api/")) {
     return next();
   }
-  res.sendFile(path.join(__dirname, "build", "index.html"));
+  res.sendFile(path.join(__dirname, "build", "index.html"), (err) => {
+    if (err) {
+      console.error("Error sending file:", err);
+      res.status(500).send("Error loading app");
+    }
+  });
 });
 
 // 404 handler
@@ -74,23 +78,21 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`
-    🚀 Server is running on port ${PORT}
-    📁 Serving static files from: ${path.join(__dirname, "build")}
-    🔧 Environment: ${process.env.NODE_ENV || "development"}
-    `);
+Server running on port ${PORT}
+Environment: ${process.env.NODE_ENV || "development"}
+Static files from: ${path.join(__dirname, "build")}
+  `);
 });
 
-// Handle uncaught exceptions
+// Error handlers
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception:", err);
   process.exit(1);
 });
 
-// Handle unhandled promise rejections
 process.on("unhandledRejection", (reason, promise) => {
   console.error("Unhandled Rejection at:", promise, "reason:", reason);
   process.exit(1);
