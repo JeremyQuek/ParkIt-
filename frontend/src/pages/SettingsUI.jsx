@@ -132,10 +132,10 @@ function Settings() {
           aria-label="back"
           style={{
             position: "absolute",
-            left: 10,
+            left: 20,
           }}
         >
-          <IoIosArrowBack size={24} />
+          <IoIosArrowBack size={28} />
         </IconButton>
         <h1>Settings</h1>
       </div>

@@ -13,7 +13,7 @@ code {
 }
 
 .ios {
-    max-width: 450px;
-    margin-left: calc((100% - 450px) / 2);
+    max-width: 390px;
+    margin-left: calc((100% - 390px) / 2);
     height: 100%;
 }

@@ -13,7 +13,7 @@ const TopBar = () => (
         left: 10,
       }}
     >
-      <MdOutlineBookmarkBorder size={26} />
+      <MdOutlineBookmarkBorder size={28} />
     </Link>
     <h1>Where to?</h1>
     <Link
@@ -24,7 +24,7 @@ const TopBar = () => (
         right: 10,
       }}
     >
-      <TbSettings size={26} />
+      <TbSettings size={28} />
     </Link>
   </div>
 );

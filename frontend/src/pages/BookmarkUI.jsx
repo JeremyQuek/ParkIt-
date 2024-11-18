@@ -183,9 +183,9 @@ const Bookmarks = () => {
           edge="start"
           color="inherit"
           aria-label="back"
-          style={{ position: "absolute", left: 10 }}
+          style={{ position: "absolute", left: 15 }}
         >
-          <IoIosArrowBack size={24} />
+          <IoIosArrowBack size={28} />
         </IconButton>
         <h1 style={{ textAlign: "center" }}>Bookmarks</h1>
       </div>
