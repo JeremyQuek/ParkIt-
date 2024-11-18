@@ -8,9 +8,9 @@
       "type": "image/x-icon"
     },
     {
-      "src": "graph_icon2.png",
+      "src": "graph_icon3.png",
       "type": "image/png",
-      "sizes": "64x64"
+      "sizes": "64x64 32x32 24x24 16x16"
     }
   ],
   "start_url": ".",
