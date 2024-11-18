@@ -10,6 +10,7 @@ load_dotenv()
 KEY=os.getenv("GROQ_KEY")
 client = Groq(api_key=KEY)
 
+@measure_time
 def sort_by_dist(target, carpark_data, k=10):
     res=set()
     for id in carpark_data.keys():

@@ -206,6 +206,7 @@ def delete_bookmark(uid: str, loc: str):
         if conn:
             conn.close()
 
+@measure_time
 def retrieve_bookmarks(uid: str):
     """Retrieve all bookmarks for a user"""
     conn = open_connection()

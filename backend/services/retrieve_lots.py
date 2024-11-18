@@ -15,6 +15,7 @@ def search_by_id_HDB(id, lots_data):
         if lot["carpark_number"]==id:
             return lot["carpark_info"]
 
+@measure_time
 def update_result_with_HDB_lots(carpark_data):
     lots_data = retrieve_HDB_lots()
     for carpark in carpark_data:
@@ -29,7 +30,7 @@ def search_by_id_LTA(id, lots_data):
                 "lots_available": lot["AvailableLots"],
                 "total_lots": None
             }
-
+@measure_time
 def update_result_with_LTA_lots(carpark_data):
     lots_data = retrieve_LTA_lots()
     for carpark in carpark_data:
