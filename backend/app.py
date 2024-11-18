@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 app = Flask(__name__)
 CORS(app)
 
-db.main()
+# db.main()
 
 app.register_blueprint(bookmarks_bp)
 app.register_blueprint(searchcarpark_bp)
