@@ -158,11 +158,12 @@ def retrieve_bookmarks(uid: str):
     conn = open_connection()
     try:
         cur = conn.cursor()
+        # Modified query to use user_id directly instead of going through users.id
         cur.execute("""
             SELECT name, location, lat, long
             FROM bookmarks
-            WHERE user_id = (SELECT id FROM users WHERE user_id = %s)
-        """, (uid,))
+            WHERE user_id = %s
+        """, (uid,))  # Direct comparison with user_id
         return cur.fetchall()
     except Error as e:
         print(f"Error retrieving bookmarks: {e}")
@@ -304,5 +305,5 @@ def create_user():
             conn.close()
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
