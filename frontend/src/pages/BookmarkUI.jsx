@@ -19,6 +19,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { DeleteOutline } from "@mui/icons-material";
 import { IoNavigate } from "react-icons/io5";
@@ -39,6 +40,8 @@ const Bookmarks = () => {
   const [bookmarkName, setBookmarkName] = useState("");
   const [nameError, setNameError] = useState(false);
   const [locationError, setLocationError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const initializeMap = () => {
     if (map.current) return;
@@ -77,11 +80,12 @@ const Bookmarks = () => {
         name: e.result.place_name,
         coordinates: e.result.center,
       });
-      setLocationError(false); // Clear location error when a location is selected
+      setLocationError(false);
     });
   };
 
   const fetchBookmarks = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(backend_url + "/bookmarks", {
         params: {
@@ -91,6 +95,8 @@ const Bookmarks = () => {
       setBookmarks(response.data);
     } catch (error) {
       console.error("Error fetching bookmarks:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,16 +105,17 @@ const Bookmarks = () => {
   }, []);
 
   const deleteBookmark = async (location) => {
+    setIsSubmitting(true);
     try {
       await axios.post(backend_url + "/bookmarks/delete", {
-        location: location[0],
+        location: location[1], // Changed to location[1] to match the location name
         uid: uid,
       });
-      setBookmarks((prevBookmarks) =>
-        prevBookmarks.filter((bookmark) => bookmark !== location),
-      );
+      await fetchBookmarks(); // Refresh the bookmarks after deletion
     } catch (error) {
       console.error("Error deleting bookmark:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -139,11 +146,6 @@ const Bookmarks = () => {
     }
   };
 
-  useEffect(() => {
-    fetchBookmarks();
-    console.log("bookmarks:", bookmarks); // Add this
-  }, []);
-
   const handleAddBookmark = async () => {
     if (!bookmarkName.trim()) {
       setNameError(true);
@@ -154,6 +156,7 @@ const Bookmarks = () => {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       await axios.post(backend_url + "/bookmarks/add", {
         uid: uid,
@@ -161,22 +164,13 @@ const Bookmarks = () => {
         location: selectedLocation.name,
         coordinates: selectedLocation.coordinates,
       });
-
-      setBookmarks((prevBookmarks) => [
-        ...prevBookmarks,
-        [
-          bookmarkName, // name
-          selectedLocation.name, // location
-          selectedLocation.coordinates[0], // latitude
-          selectedLocation.coordinates[1], // longitude
-        ],
-      ]);
-      setNameError(false);
-      setLocationError(false);
-      handleCloseDialog();
     } catch (error) {
       console.error("Error adding bookmark:", error);
       console.log(error.response);
+    } finally {
+      setIsSubmitting(false);
+      handleCloseDialog(); // Close dialog regardless of success or failure
+      fetchBookmarks(); // Fetch bookmarks after closing dialog
     }
   };
 
@@ -202,43 +196,56 @@ const Bookmarks = () => {
         My Bookmarks
       </h3>
 
-      <List className="bookmark-list">
-        {bookmarks.map((bookmark, index) => (
-          <React.Fragment key={index}>
-            <ListItem button className="bookmark-box">
-              <ListItemText
-                primary={bookmark[0]} // This gets the name from the database
-                secondary={bookmark[1]} // This gets the location from the database
-                primaryTypographyProps={{
-                  style: {
-                    fontWeight: 500,
-                    marginBottom: "4px",
-                  },
-                }}
-                secondaryTypographyProps={{
-                  style: {
-                    fontSize: "0.875rem",
-                    color: "rgba(0, 0, 0, 0.6)",
-                  },
-                }}
-              />
-              <IconButton
-                onClick={() => handleNavigate([bookmark[2], bookmark[3]])}
-                sx={{ color: "#1976d2" }}
-              >
-                <IoNavigate />
-              </IconButton>
-              <IconButton
-                edge="end"
-                onClick={() => deleteBookmark(bookmark)}
-                color="error"
-              >
-                <DeleteOutline />
-              </IconButton>
-            </ListItem>
-          </React.Fragment>
-        ))}
-      </List>
+      {isLoading ? (
+        <div
+          style={{ display: "flex", justifyContent: "center", padding: "20px" }}
+        >
+          <CircularProgress />
+        </div>
+      ) : (
+        <List className="bookmark-list">
+          {bookmarks.map((bookmark, index) => (
+            <React.Fragment key={index}>
+              <ListItem button className="bookmark-box">
+                <ListItemText
+                  primary={bookmark[0]}
+                  secondary={bookmark[1]}
+                  primaryTypographyProps={{
+                    style: {
+                      fontWeight: 500,
+                      marginBottom: "4px",
+                    },
+                  }}
+                  secondaryTypographyProps={{
+                    style: {
+                      fontSize: "0.875rem",
+                      color: "rgba(0, 0, 0, 0.6)",
+                    },
+                  }}
+                />
+                <IconButton
+                  onClick={() => handleNavigate([bookmark[2], bookmark[3]])}
+                  sx={{ color: "#1976d2" }}
+                >
+                  <IoNavigate />
+                </IconButton>
+                <IconButton
+                  edge="end"
+                  onClick={() => deleteBookmark(bookmark)}
+                  color="error"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <DeleteOutline />
+                  )}
+                </IconButton>
+              </ListItem>
+            </React.Fragment>
+          ))}
+        </List>
+      )}
 
       <Button
         variant="outlined"
@@ -273,9 +280,9 @@ const Bookmarks = () => {
             borderRadius: "16px",
             margin: "16px",
             animation: "slideUp 300ms ease-out",
-            maxHeight: "100%", // Add this
+            maxHeight: "100%",
             width: "450px",
-            overflow: "hidden", // Add this
+            overflow: "hidden",
           },
         }}
         TransitionProps={{
@@ -312,7 +319,7 @@ const Bookmarks = () => {
             value={bookmarkName}
             onChange={(e) => {
               setBookmarkName(e.target.value);
-              setNameError(false); // Clear error when user types
+              setNameError(false);
             }}
             placeholder="Enter bookmark name"
             error={nameError}
@@ -343,15 +350,19 @@ const Bookmarks = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="primary">
+          <Button
+            onClick={handleCloseDialog}
+            color="primary"
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
           <Button
             onClick={handleAddBookmark}
             color="primary"
-            disabled={!selectedLocation}
+            disabled={!selectedLocation || isSubmitting}
           >
-            Add
+            {isSubmitting ? <CircularProgress size={24} /> : "Add"}
           </Button>
         </DialogActions>
       </Dialog>

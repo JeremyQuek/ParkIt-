@@ -139,8 +139,7 @@ def delete_bookmark(uid: str, loc: str):
         cur = conn.cursor()
         cur.execute("""
             DELETE FROM bookmarks
-            WHERE user_id = (SELECT id FROM users WHERE user_id = %s)
-            AND location = %s
+            WHERE user_id = %s AND location = %s
         """, (uid, loc))
         conn.commit()
         return True
@@ -152,7 +151,6 @@ def delete_bookmark(uid: str, loc: str):
             cur.close()
         if conn:
             conn.close()
-
 def retrieve_bookmarks(uid: str):
     """Retrieve all bookmarks for a user"""
     conn = open_connection()
@@ -183,21 +181,20 @@ def create_db():
         # Create users table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                user_id VARCHAR(10) NOT NULL UNIQUE
+                user_id VARCHAR(10) PRIMARY KEY
             )
         """)
 
-        # Create bookmarks table
+        # Create bookmarks table with user_id as VARCHAR
         cur.execute("""
             CREATE TABLE IF NOT EXISTS bookmarks (
                 id SERIAL PRIMARY KEY,
-                user_id INTEGER NOT NULL,
+                user_id VARCHAR(10) NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 location VARCHAR(255) NOT NULL,
                 lat VARCHAR(100) NOT NULL,
                 long VARCHAR(100) NOT NULL,
-                FOREIGN KEY (user_id) REFERENCES users(id),
+                FOREIGN KEY (user_id) REFERENCES users(user_id),
                 UNIQUE (user_id, location)
             )
         """)
