@@ -13,7 +13,6 @@ client = Groq(api_key=KEY)
 def sort_by_dist(target, carpark_data, k=10):
     res=set()
     for id in carpark_data.keys():
-        print(carpark_data[id])
         dist=calculate_distance(target, (float(carpark_data[id]['lat']), float(carpark_data[id]["long"])))
         res.add((dist, id))
         if len(res)>k:
