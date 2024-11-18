@@ -172,7 +172,7 @@ def insert_bookmark(uid: str, name: str, loc: str, coords: list):
         cur = conn.cursor()
         cur.execute("""
             INSERT INTO bookmarks (user_id, name, location, lat, long)
-            VALUES ((SELECT id FROM users WHERE user_id = %s), %s, %s, %s, %s)
+            VALUES ((SELECT id FROM users WHERE user_id = %s::VARCHAR), %s, %s, %s, %s)
         """, (uid, name, loc, coords[0], coords[1]))
         conn.commit()
         return True
@@ -192,7 +192,7 @@ def delete_bookmark(uid: str, loc: str):
         cur = conn.cursor()
         cur.execute("""
             DELETE FROM bookmarks
-            WHERE user_id = (SELECT id FROM users WHERE user_id = %s)
+            WHERE user_id = (SELECT id FROM users WHERE user_id = %s::VARCHAR)
             AND location = %s
         """, (uid, loc))
         conn.commit()
@@ -214,7 +214,7 @@ def retrieve_bookmarks(uid: str):
         cur.execute("""
             SELECT name, location, lat, long
             FROM bookmarks
-            WHERE user_id = (SELECT id FROM users WHERE user_id = %s)
+            WHERE user_id = (SELECT id FROM users WHERE user_id = %s::VARCHAR)
         """, (uid,))
         return cur.fetchall()
     except Error as e:

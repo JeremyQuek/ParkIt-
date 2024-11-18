@@ -12,9 +12,9 @@ from dotenv import load_dotenv
 load_dotenv()
 BACKEND_URL=os.getenv("BACKEND_URL")
 
-findcarpark_bp = Blueprint('findcarpark', __name__)
+searchcarpark_bp = Blueprint('findcarpark', __name__)
 
-@findcarpark_bp.route("/carpark", methods=["GET"])
+@searchcarpark_bp.route("/carpark", methods=["GET"])
 def get_carparks():
     carpark_data = db.retrieve_carparks()
     if carpark_data:
@@ -23,7 +23,7 @@ def get_carparks():
         return make_response(jsonify({"error": "No carpark data found or an error occurred"}), 404)
 
 
-@findcarpark_bp.route('/find')
+@searchcarpark_bp.route('/find')
 @measure_time
 def carparkfinder():
     carpark_data=db.retrieve_carparks()
