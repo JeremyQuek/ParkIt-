@@ -1,7 +1,6 @@
 import requests
 from flask import Blueprint, jsonify, request, make_response
 
-from services.retrieve_lots import update_result_with_LTA_lots, update_result_with_HDB_lots
 from services.sort_methods import sort_by_dist, sort_by_lots, sort_by_price
 from utils.performance import measure_time
 from services import database as db
