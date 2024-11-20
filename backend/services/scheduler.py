@@ -66,5 +66,8 @@ def cache_lots_and_update_db():
         if conn:
             conn.close()
 
+def ping():
+    return
+
 # if __name__ == "__main__":
 #     retrieve_and_update_db()
