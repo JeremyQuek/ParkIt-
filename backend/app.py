@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_apscheduler import APScheduler
 
 from services import database as db
-from services.cache import retrieve_and_update_db
+from services.cache import cache_lots_and_update_db
 # db.main()
 
 from routes.bookmarksController import bookmarks_bp
