@@ -5,6 +5,7 @@ import csv
 import os
 from psycopg2 import Error
 import random
+
 load_dotenv()
 DB_PARAMS = {
     'dbname': os.getenv('DB_NAME'),
@@ -22,6 +23,43 @@ def open_connection():
         print(f"Error connecting to PostgreSQL: {e}")
         return None
 
+def create_user():
+    conn = open_connection()
+    try:
+        cur = conn.cursor()
+        while True:
+            number = random.randint(10**9, 10**10 - 1)
+            cur.execute("SELECT COUNT(*) FROM users WHERE user_id = %s", (str(number),))
+            if cur.fetchone()[0] == 0:
+                cur.execute("INSERT INTO users (user_id) VALUES (%s)", (str(number),))
+                conn.commit()
+                break
+        return number
+    except Exception as e:
+        print(f"Error creating user: {e}")
+        return None
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+def check_user(uid):
+    """Check if a user exists in the database"""
+    conn = open_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE user_id = %s", (str(uid),))
+        res = cur.fetchone()
+        return bool(res)
+    except Error as e:
+        print(f"Error checking user: {e}")
+        return False
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
 
 def create_carpark(conn):
     """Create the carpark table if it doesn't exist"""
@@ -34,6 +72,9 @@ def create_carpark(conn):
                 address VARCHAR(200) NOT NULL,
                 lat VARCHAR(200) NOT NULL,
                 long VARCHAR(200) NOT NULL,
+                lot_type VARCHAR(10),
+                lots_available VARCHAR(10),
+                total_lots VARCHAR(10),
                 price VARCHAR(200) NOT NULL,
                 price_weekend VARCHAR(200) NOT NULL,
                 ev VARCHAR(10) NOT NULL
@@ -95,6 +136,7 @@ def populate_carparks(data, conn):
         if cur:
             cur.close()
 
+@measure_time
 def retrieve_carparks():
     conn=open_connection()
     try:
@@ -114,7 +156,10 @@ def retrieve_carparks():
                 columns[4]: row[4],  # long
                 columns[5]: row[5],  # price
                 columns[6]: row[6],  # price_weekend
-                columns[7]: row[7]   # ev
+                columns[7]: row[7],  # ev
+                columns[8]: row[8],
+                columns[9]: row[9],
+                columns[10]: row[10]
             }
             for row in rows
         }
@@ -166,6 +211,7 @@ def create_bookmarks():
         if conn:
             conn.close()
 
+@measure_time
 def insert_bookmark(uid: str, name: str, loc: str, coords: list):
     """Insert a new bookmark"""
     conn = open_connection()
@@ -186,6 +232,7 @@ def insert_bookmark(uid: str, name: str, loc: str, coords: list):
         if conn:
             conn.close()
 
+@measure_time
 def delete_bookmark(uid: str, loc: str):
     """Delete a bookmark"""
     conn = open_connection()
@@ -229,83 +276,41 @@ def retrieve_bookmarks(uid: str):
             conn.close()
 
 
-def create_user():
-    conn = open_connection()
-    try:
-        cur = conn.cursor()
-        while True:
-            number = random.randint(10**9, 10**10 - 1)
-            cur.execute("SELECT COUNT(*) FROM users WHERE user_id = %s", (str(number),))
-            if cur.fetchone()[0] == 0:
-                cur.execute("INSERT INTO users (user_id) VALUES (%s)", (str(number),))
-                conn.commit()
-                break
-        return number
-    except Exception as e:
-        print(f"Error creating user: {e}")
-        return None
-    finally:
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
+# def main():
+#     # Connect to database
+#     conn = open_connection()
+#     if not conn:
+#         return
 
-def check_user(uid):
-    """Check if a user exists in the database"""
-    conn = open_connection()
-    try:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE user_id = %s", (str(uid),))
-        res = cur.fetchone()
-        return bool(res)
-    except Error as e:
-        print(f"Error checking user: {e}")
-        return False
-    finally:
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
+#     try:
+#         # Create table
+#         create_table(conn)
 
+#         # Prepare data from CSV
+#         desired_headers = ['agency', 'carpark_id', 'address', 'lat', 'long',
+#                          'price', 'price_weekend', 'EV']
 
-def main():
-    # Connect to database
-    conn = open_connection()
-    if not conn:
-        return
+#         csv_file_path = './assets/CarparkInformation_final.csv'
+#         data = []
 
-    try:
-        # Create table
-        create_table(conn)
+#         with open(csv_file_path, mode='r') as file:
+#             reader = csv.DictReader(file)
+#             for row in reader:
+#                 selected_row = {key: row[key] for key in desired_headers if key in row}
+#                 data.append(tuple(selected_row.values()))
 
-        # Prepare data from CSV
-        desired_headers = ['agency', 'carpark_id', 'address', 'lat', 'long',
-                         'price', 'price_weekend', 'EV']
+#         # Populate database
+#         populate_carparks(data, conn)
 
-        csv_file_path = './assets/CarparkInformation_final.csv'
-        data = []
+#         # Print row count for verification
+#         cur = conn.cursor()
+#         cur.execute("SELECT COUNT(*) FROM carpark")
+#         count = cur.fetchone()[0]
+#         print(f"Total rows in database: {count}")
 
-        with open(csv_file_path, mode='r') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                selected_row = {key: row[key] for key in desired_headers if key in row}
-                data.append(tuple(selected_row.values()))
-
-        # Populate database
-        populate_carparks(data, conn)
-
-        # Print row count for verification
-        cur = conn.cursor()
-        cur.execute("SELECT COUNT(*) FROM carpark")
-        count = cur.fetchone()[0]
-        print(f"Total rows in database: {count}")
-
-    except Exception as e:
-        print(f"An error occurred: {e}")
-    finally:
-        if conn:
-            conn.close()
-            print("Database connection closed")
-
-# if __name__ == "__main__":
-#     main()
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+#     finally:
+#         if conn:
+#             conn.close()
+#             print("Database connection closed")

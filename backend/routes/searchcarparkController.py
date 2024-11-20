@@ -33,8 +33,6 @@ def carparkfinder():
     destination = (lat, lon)
 
     res = sort_by_dist(destination, carpark_data)
-    update_result_with_HDB_lots(res)
-    update_result_with_LTA_lots(res)
 
     # sort_options = requests.get(BACKEND_URL + "sort").json()
     # sort_type = sort_options["sort_type"]
