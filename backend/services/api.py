@@ -16,29 +16,6 @@ LTA_URL=os.getenv("LTA_LOTS_URL")
 ACCESS_KEY=os.getenv("LTA_ACCESS_KEY")
 
 def retrieve_HDB_lots():
-    try:
-        response = requests.get(HDB_URL)
-        response.raise_for_status()
-        data = response.json()
-        return data["items"][0]['carpark_data'] #dictionary
-    except requests.exceptions.RequestException as e:
-        return None
-
-def retrieve_LTA_lots():
-    headers = {
-        'AccountKey': ACCESS_KEY,
-        'Accept': 'application/json'
-    }
-    try:
-        response = requests.get(
-            LTA_URL,
-            headers=headers
-        )
-        return [data for data in response.json()['value'] if data['Agency']!="HDB"] # dictionary
-    except requests.exceptions.RequestException as e:
-        return None
-
-def retrieve_HDB_lots1():
         try:
             response = requests.get("https://api.data.gov.sg/v1/transport/carpark-availability")
             response.raise_for_status()
@@ -54,7 +31,7 @@ def retrieve_HDB_lots1():
         except requests.exceptions.RequestException as e:
             return "error"
 
-def retrieve_LTA_lots1():
+def retrieve_LTA_lots():
             headers = {
                 'AccountKey': "pTDfKV74SOWJSo3vyY+BiA==",
                 'Accept': 'application/json'
@@ -68,7 +45,7 @@ def retrieve_LTA_lots1():
                     "carpark_id":data["CarParkID"],
                     "lot_type": "C",
                     "lots_available": data["AvailableLots"],
-                    "total_lots" : None
+                    "total_lots" : ""
                 } for data in response.json()["value"] if data['Agency']!="HDB"]
 
             except requests.exceptions.RequestException as e:

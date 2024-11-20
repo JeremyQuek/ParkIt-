@@ -34,7 +34,8 @@ def carparkfinder():
 
     res = sort_by_dist(destination, carpark_data)
 
-    # sort_options = requests.get(BACKEND_URL + "sort").json()
+    sort_options = requests.get(BACKEND_URL + "sort").json()
+    print(sort_options)
     # sort_type = sort_options["sort_type"]
     # show_ev = sort_options["show_ev"]
     # veh_type=sort_options["veh_type"]
