@@ -3,9 +3,10 @@ import os
 import psycopg2
 from psycopg2 import Error
 from dotenv import load_dotenv
-from backend.utils.performance import measure_time
+from utils.performance import measure_time
 from services.api import retrieve_HDB_lots1, retrieve_LTA_lots1
 from services.database import open_connection
+
 load_dotenv()
 DB_PARAMS = {
     'dbname': os.getenv('DB_NAME'),
@@ -15,7 +16,7 @@ DB_PARAMS = {
 }
 
 @measure_time
-def retrieve_and_update_db():
+def cache_lots_and_update_db():
     data = retrieve_HDB_lots1()
     data.extend(retrieve_LTA_lots1())
     data = [(d['carpark_id'], d['lot_type'], d['lots_available'], d['total_lots']) for d in data][:2]

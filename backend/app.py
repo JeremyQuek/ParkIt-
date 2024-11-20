@@ -24,7 +24,7 @@ app.register_blueprint(sort_option_bp)
 scheduler = APScheduler()
 @scheduler.task("interval", id = "my_job", seconds=60)
 def cache_job():
-    retrieve_and_update_db()
+    cache_lots_and_update_db()
 
 scheduler.init_app(app)
 scheduler.start()
