@@ -28,7 +28,7 @@ function LandingPage() {
   };
 
   return (
-    <div onClick={handleClickAnywhere}>
+    <div className="page" onClick={handleClickAnywhere}>
       {showWelcome && (
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -37,7 +37,7 @@ function LandingPage() {
           style={{
             position: "absolute",
             top: "25%",
-            left: "25%",
+            left: "20%",
             transform: "translate(-50%, -50%)",
             textAlign: "center",
           }}
