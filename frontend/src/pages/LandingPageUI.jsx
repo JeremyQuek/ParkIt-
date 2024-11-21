@@ -37,7 +37,7 @@ function LandingPage() {
           style={{
             position: "absolute",
             top: "25%",
-            left: "40%",
+            left: "25%",
             transform: "translate(-50%, -50%)",
             textAlign: "center",
           }}
