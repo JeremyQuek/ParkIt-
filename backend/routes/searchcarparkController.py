@@ -1,9 +1,11 @@
 import requests
 from flask import Blueprint, jsonify, request, make_response
 
+
 from services.sort_methods import sort_by_dist, sort_by_lots, sort_by_price
 from utils.performance import measure_time
 from services import database as db
+from routes import settingsController as settings
 
 import os
 from dotenv import load_dotenv
@@ -26,30 +28,26 @@ def get_carparks():
 @measure_time
 def carparkfinder():
     carpark_data=db.retrieve_carparks()
+
     lat = request.args.get('lat', type=float)
     lon = request.args.get('lon', type=float)
-
     destination = (lat, lon)
 
     res = sort_by_dist(destination, carpark_data)
 
-    # sort_type = sort_options["sort_type"]
-    # show_ev = sort_options["show_ev"]
-    # veh_type=sort_options["veh_type"]
+    if settings.show_ev == "false":
+        for carpark in res:
+            carpark["EV"] = 0
 
-    # if show_ev == "false":
-    #     for carpark in res:
-    #         carpark["EV"] = 0
+    if settings.sort_type == "price":
+            sort_by_price(res)
+    elif settings.sort_type == "lots":
+            sort_by_lots(res)
 
-    # if sort_type == "price":
-    #         sort_by_price(res)
-    # elif sort_type == "lots":
-    #         sort_by_lots(res)
-
-    # if veh_type == "motorcycle":
-    #      for carpark in res:
-    #         carpark["lot_type"]="M"
-    #         carpark["price"]= "$0.65/hr" if carpark["agency"] == "HDB" else carpark["price"]
+    if settings.veh_type == "motorcycle":
+         for carpark in res:
+            carpark["lot_type"]="M"
+            carpark["price"]= "$0.65/hr" if carpark["agency"] == "HDB" else carpark["price"]
 
     return jsonify({
             "status": "success",
