@@ -1,6 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
-import LottieView from "lottie-react";
-import mapAnimation from "./animations/mapAnimation.json";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import "./style.css";
@@ -8,48 +6,34 @@ import "./style.css";
 function LandingPage() {
   const navigate = useNavigate();
   const [showWelcome, setShowWelcome] = useState(false);
-  const [welcomeOpacity, setWelcomeOpacity] = useState(1);
-  const [showMapAnimation, setShowMapAnimation] = useState(false);
-  const mapAnimationRef = useRef(null);
-
-  useEffect(() => {
-    if (mapAnimationRef.current) {
-      mapAnimationRef.current.setSpeed(0.001);
-    }
-  }, [showMapAnimation]);
+  const [showClickText, setShowClickText] = useState(false);
 
   useEffect(() => {
     const welcomeTimer = setTimeout(() => {
       setShowWelcome(true);
-    }, 1500);
+    }, 1000);
 
-    const showMapTimer = setTimeout(() => {
-      setShowMapAnimation(true);
-    }, 2500);
+    const showTextTimer = setTimeout(() => {
+      setShowClickText(true);
+    }, 3000);
 
     return () => {
       clearTimeout(welcomeTimer);
-      clearTimeout(showMapTimer);
+      clearTimeout(showTextTimer);
     };
-  }, [navigate]);
+  }, []);
 
-  const handleAnimationComplete = () => {
+  const handleClickAnywhere = () => {
     navigate("/navigation");
   };
 
   return (
-    <>
+    <div onClick={handleClickAnywhere}>
       {showWelcome && (
         <motion.div
-          initial={{ opacity: 0, y: 50 }} // Start 50px below and invisible
-          animate={{
-            opacity: welcomeOpacity,
-            y: 0, // Move to original position
-          }}
-          transition={{
-            duration: 1.2,
-            ease: "easeOut",
-          }}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
           style={{
             position: "absolute",
             top: "25%",
@@ -63,35 +47,47 @@ function LandingPage() {
         </motion.div>
       )}
 
-      {showMapAnimation && (
+      {/* Static logo, no animation */}
+      <div
+        style={{
+          position: "absolute",
+          top: "51%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "150px",
+          height: "150px",
+        }}
+      >
+        <img
+          src={`${process.env.PUBLIC_URL}/graph_icon.png`}
+          alt="Graph Icon"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+          }}
+        />
+      </div>
+
+      {showClickText && (
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{
-            opacity: welcomeOpacity,
-          }}
-          transition={{
-            duration: 0.5,
-            ease: "easeInOut",
-          }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
           style={{
             position: "absolute",
-            top: "50%",
+            bottom: "10%",
             left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "10%",
-            height: "10%",
+            transform: "translateX(-50%)",
+            textAlign: "center",
           }}
         >
-          <LottieView
-            animationData={mapAnimation}
-            loop={false}
-            speed={0.2}
-            lottieRef={mapAnimationRef}
-            onComplete={handleAnimationComplete}
-          />
+          <p style={{ color: "gray", fontSize: "16px" }}>
+            Click anywhere to continue
+          </p>
         </motion.div>
       )}
-    </>
+    </div>
   );
 }
 

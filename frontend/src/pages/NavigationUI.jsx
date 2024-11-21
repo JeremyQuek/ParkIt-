@@ -30,6 +30,7 @@ function Navigation() {
   const [showPopup, setShowPopup] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const [visibleResults, setVisibleResults] = useState(3); // Changed to 3
+  const [userLocation, setUserLocation] = useState(null);
 
   const findCarparks = async (lat, long) => {
     try {
@@ -96,6 +97,18 @@ function Navigation() {
     }
   };
 
+  const handleFindNearMe = () => {
+    if (userLocation) {
+      const { lat, lon } = userLocation;
+      console.log("Triggering find carparks near:", lat, lon);
+      findCarparks(lat, lon);
+    } else {
+      console.error(
+        "User location not available. Please allow location access.",
+      );
+    }
+  };
+
   useEffect(() => {
     if (map.current) return;
     map.current = new mapboxgl.Map({
@@ -124,7 +137,6 @@ function Navigation() {
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     map.current.on("load", () => {
-      geolocate.trigger();
       if (state?.coordinates) {
         const [lon, lat] = state.coordinates;
         map.current.flyTo({
@@ -132,6 +144,7 @@ function Navigation() {
           zoom: 15,
           essential: true,
         });
+
         const markerId = `carpark-marker-${state?.coordinates}`;
         const markerElement = document.createElement("div");
         markerElement.id = markerId;
@@ -139,17 +152,20 @@ function Navigation() {
         new mapboxgl.Marker(markerElement)
           .setLngLat([lon, lat])
           .addTo(map.current);
+
         setEndPoint(state.coordinates);
         findCarparks(lat, lon);
-      } else {
       }
+
+      geolocate.trigger();
     });
 
     geolocate.on("geolocate", (e) => {
       const lon = e.coords.longitude;
       const lat = e.coords.latitude;
+      console.log("Geolocation result:", { lat, lon });
       setStartPoint([lon, lat]);
-      findCarparks(lat, lon);
+      setUserLocation({ lat, lon }); // Store the geolocation
     });
 
     geocoder.on("result", (e) => {
