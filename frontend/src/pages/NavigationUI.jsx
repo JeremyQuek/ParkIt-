@@ -109,8 +109,11 @@ function Navigation() {
     }
   };
 
+  const [isUserInput, setIsUserInput] = useState(false);
+
   useEffect(() => {
     if (map.current) return;
+
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v11",
@@ -137,26 +140,6 @@ function Navigation() {
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     map.current.on("load", () => {
-      if (state?.coordinates) {
-        const [lon, lat] = state.coordinates;
-        map.current.flyTo({
-          center: [lon, lat],
-          zoom: 15,
-          essential: true,
-        });
-
-        const markerId = `carpark-marker-${state?.coordinates}`;
-        const markerElement = document.createElement("div");
-        markerElement.id = markerId;
-        markerElement.className = "marker";
-        new mapboxgl.Marker(markerElement)
-          .setLngLat([lon, lat])
-          .addTo(map.current);
-
-        setEndPoint(state.coordinates);
-        findCarparks(lat, lon);
-      }
-
       geolocate.trigger();
     });
 
@@ -165,15 +148,23 @@ function Navigation() {
       const lat = e.coords.latitude;
       console.log("Geolocation result:", { lat, lon });
       setStartPoint([lon, lat]);
-      setUserLocation({ lat, lon }); // Store the geolocation
+      setUserLocation({ lat, lon });
+
+      // Trigger findCarparks only if no user input
+      if (!isUserInput) {
+        findCarparks(lat, lon);
+      }
     });
 
     geocoder.on("result", (e) => {
       const [longitude, latitude] = e.result.center;
-      setEndPoint(e.result.center);
+      console.log("User search route result:", { longitude, latitude });
+
+      setIsUserInput(true); // Block geolocation-triggered carpark finding
+      setEndPoint([longitude, latitude]);
       findCarparks(latitude, longitude);
     });
-  }, []);
+  }, [isUserInput]);
 
   useEffect(() => {
     const fetchRoute = async () => {
