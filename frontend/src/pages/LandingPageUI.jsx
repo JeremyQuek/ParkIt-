@@ -36,8 +36,8 @@ function LandingPage() {
           transition={{ duration: 1.2, ease: "easeOut" }}
           style={{
             position: "absolute",
-            top: "20%",
-            left: "22.5%",
+            top: "18%",
+            left: "21%",
             transform: "translate(-50%, -50%)",
             textAlign: "center",
           }}
