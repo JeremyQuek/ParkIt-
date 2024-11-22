@@ -7,10 +7,17 @@ import { TbHeadphones } from "react-icons/tb";
 import { RiQuestionLine } from "react-icons/ri";
 import { BiSearchAlt } from "react-icons/bi";
 import { MdPersonOutline } from "react-icons/md";
-
-import { IconButton } from "@mui/material";
+import {
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+} from "@mui/material";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import "./style.css";
+import React, { useState } from "react";
 
 function SettingsMain() {
   const Liststyle = {
@@ -21,6 +28,23 @@ function SettingsMain() {
   const item_style = {
     margin: "3px 0px",
   };
+
+  // State for controlling the dialog box
+  const [openDialog, setOpenDialog] = useState(false);
+
+  // Handle opening the dialog
+  const handleHelpClick = () => {
+    setOpenDialog(true);
+  };
+
+  // Handle closing the dialog, with redirection if confirmed
+  const handleDialogClose = (redirect) => {
+    setOpenDialog(false);
+    if (redirect) {
+      window.open("https://github.com/JeremyQuek/ParkIt_App", "_blank");
+    }
+  };
+
   return (
     <div className="page">
       <div
@@ -81,11 +105,7 @@ function SettingsMain() {
             primary="Help and Support"
             secondary="Read our project and developer docs"
           />
-          <IconButton
-            onClick={() =>
-              window.open("https://github.com/JeremyQuek/ParkIt_App", "_blank")
-            }
-          >
+          <IconButton onClick={handleHelpClick}>
             <IoIosArrowForward size={20} />
           </IconButton>
         </ListItem>
@@ -104,6 +124,25 @@ function SettingsMain() {
           </IconButton>
         </ListItem>
       </List>
+
+      {/* Confirmation Dialog for Help and Support redirection */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Confirm Redirection</DialogTitle>
+        <DialogContent>
+          <p>
+            You are about to be redirected to the GitHub documentation. Are you
+            sure?
+          </p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleDialogClose(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={() => handleDialogClose(true)} color="primary">
+            Yes, Go to Docs
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

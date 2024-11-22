@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { TextField, Grid, Box, Divider } from "@mui/material";
+import { TextField, Grid, Box, Divider, Container } from "@mui/material";
 import { IoIosArrowBack } from "react-icons/io";
 import { IconButton } from "@mui/material";
 import "./style.css";
@@ -71,71 +71,74 @@ function Account() {
         <h1>Account</h1>
       </div>
       <br />
-      <div className="account-form">
-        {/* First Name and Last Name in the same row */}
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="First Name"
-              variant="outlined"
-              value={firstName}
-              onChange={(e) => handleInputChange(e, setFirstName)}
-            />
+      {/* Wrap the content in a Container with padding */}
+      <Container style={{ padding: "0 5px", maxWidth: "90%" }}>
+        <div className="account-form">
+          {/* First Name and Last Name in the same row */}
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="First Name"
+                variant="outlined"
+                value={firstName}
+                onChange={(e) => handleInputChange(e, setFirstName)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Last Name"
+                variant="outlined"
+                value={lastName}
+                onChange={(e) => handleInputChange(e, setLastName)}
+              />
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              label="Last Name"
-              variant="outlined"
-              value={lastName}
-              onChange={(e) => handleInputChange(e, setLastName)}
-            />
+
+          <Divider sx={{ margin: "20px 0" }} />
+
+          {/* Email field in a separate row */}
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Email"
+                variant="outlined"
+                value={email}
+                onChange={(e) => handleInputChange(e, setEmail)}
+              />
+            </Grid>
           </Grid>
-        </Grid>
 
-        <Divider sx={{ margin: "20px 0" }} />
+          <Divider sx={{ margin: "20px 0" }} />
 
-        {/* Email field in a separate row */}
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Email"
-              variant="outlined"
-              value={email}
-              onChange={(e) => handleInputChange(e, setEmail)}
-            />
+          {/* Phone number field in a separate row */}
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Phone Number"
+                variant="outlined"
+                value={phone}
+                onChange={(e) => handleInputChange(e, setPhone)}
+              />
+            </Grid>
           </Grid>
-        </Grid>
 
-        <Divider sx={{ margin: "20px 0" }} />
+          <Divider sx={{ margin: "20px 0" }} />
 
-        {/* Phone number field in a separate row */}
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Phone Number"
-              variant="outlined"
-              value={phone}
-              onChange={(e) => handleInputChange(e, setPhone)}
-            />
-          </Grid>
-        </Grid>
-
-        <Divider sx={{ margin: "20px 0" }} />
-
-        {/* Custom Save Button */}
-        <Box mt={3} display="flex" justifyContent="center">
-          <button
-            style={getButtonStyle("saveChanges")}
-            onClick={() => handleButtonClick("saveChanges")}
-          >
-            Save Changes
-          </button>
-        </Box>
-      </div>
+          {/* Custom Save Button */}
+          <Box mt={3} display="flex" justifyContent="center">
+            <button
+              style={getButtonStyle("saveChanges")}
+              onClick={() => handleButtonClick("saveChanges")}
+            >
+              Save Changes
+            </button>
+          </Box>
+        </div>
+      </Container>
     </div>
   );
 }

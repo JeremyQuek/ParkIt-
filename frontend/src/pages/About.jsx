@@ -1,8 +1,18 @@
 import { Link } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import { Car, Calendar, MapPin } from "lucide-react";
-import { IconButton, Divider, Snackbar } from "@mui/material";
+import {
+  IconButton,
+  Divider,
+  Snackbar,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+} from "@mui/material";
 import * as React from "react";
+
 function About() {
   const features = [
     {
@@ -33,6 +43,9 @@ function About() {
   const { vertical, horizontal, open } = snackbarState;
 
   const [pressedButton, setPressedButton] = React.useState(null);
+
+  // States for the Docs confirmation dialog
+  const [openDialog, setOpenDialog] = React.useState(false);
 
   const handleSnackbarClose = () => {
     setSnackbarState({ ...snackbarState, open: false });
@@ -85,6 +98,19 @@ function About() {
     color: "#3D3D3D",
     fontFamily: "'Helvetica', 'Arial', sans-serif;",
     fontSize: 15,
+  };
+
+  // Handle the Docs button click - opens the confirmation dialog
+  const handleDocsClick = () => {
+    setOpenDialog(true);
+  };
+
+  // Handle the dialog close and redirection if confirmed
+  const handleDialogClose = (redirect) => {
+    setOpenDialog(false);
+    if (redirect) {
+      window.open("https://github.com/JeremyQuek/ParkIt_App", "_blank");
+    }
   };
 
   return (
@@ -189,9 +215,7 @@ function About() {
         </button>
         <button
           style={getButtonStyle("docs")}
-          onClick={createButtonHandler("docs", () =>
-            window.open("https://github.com/JeremyQuek/ParkIt_App", "_blank"),
-          )}
+          onClick={handleDocsClick} // Trigger the dialog
         >
           Docs
         </button>
@@ -214,6 +238,25 @@ function About() {
           key={vertical + horizontal}
         />
       </div>
+
+      {/* Confirmation Dialog for Docs redirection */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Confirm Redirection</DialogTitle>
+        <DialogContent>
+          <p>
+            You are about to be redirected to the GitHub documentation. Are you
+            sure?
+          </p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => handleDialogClose(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={() => handleDialogClose(true)} color="primary">
+            Yes, Go to Docs
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
