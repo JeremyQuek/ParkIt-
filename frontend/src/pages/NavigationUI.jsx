@@ -3,6 +3,7 @@ import { useLocation } from "react-router";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 import Fab from "@mui/material/Fab";
@@ -18,6 +19,7 @@ import TopBar from "../components/Topbar";
 
 import { motion } from "framer-motion";
 import { DirectionsCarFilled } from "@mui/icons-material";
+import NavigationIcon from "@mui/icons-material/Navigation";
 
 const backend_url = process.env.REACT_APP_BACKEND_URL;
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -109,7 +111,6 @@ function Navigation() {
   };
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
-
   const [locationErrorSnackbar, setLocationErrorSnackbar] = useState(false); // New state
 
   const handleFindNearMe = () => {
@@ -133,6 +134,18 @@ function Navigation() {
     setOpenSnackbar(false);
     setLocationErrorSnackbar(false); // Close error snackbar
   };
+
+  // Function to handle opening Google Maps
+  const handleOpenGmaps = () => {
+    if (endPoint) {
+      const [lon, lat] = endPoint;
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+      window.open(googleMapsUrl, "_blank"); // Open Google Maps in a new tab
+    } else {
+      setLocationErrorSnackbar(true); // Trigger error snackbar if no destination
+    }
+  };
+
   useEffect(() => {
     if (map.current) return;
 
@@ -304,6 +317,19 @@ function Navigation() {
         >
           <DirectionsCarFilled />
         </Fab>
+
+        <Fab
+          color="secondary"
+          onClick={handleOpenGmaps}
+          sx={{
+            position: "absolute", // Fixed the typo
+            bottom: "600px", // Adjust distance from the bottom of the map container
+            left: "20px", // Adjust distance from the right of the map container
+            zIndex: 10, // Ensure it's above the map
+          }}
+        >
+          <NavigationIcon />
+        </Fab>
       </motion.div>
 
       <Snackbar
@@ -334,6 +360,20 @@ function Navigation() {
           sx={{ width: "100%" }}
         >
           Unable to locate position.
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={locationErrorSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Please enter a destination
         </Alert>
       </Snackbar>
       {carparkData && carparkData.data && (
