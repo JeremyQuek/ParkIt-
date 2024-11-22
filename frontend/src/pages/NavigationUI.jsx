@@ -327,7 +327,7 @@ function Navigation() {
           onClick={handleOpenGmaps}
           sx={{
             position: "absolute", // Fixed the typo
-            bottom: "605px", // Adjust distance from the bottom of the map container
+            bottom: "610px", // Adjust distance from the bottom of the map container
             left: "20px",
           }}
         >
