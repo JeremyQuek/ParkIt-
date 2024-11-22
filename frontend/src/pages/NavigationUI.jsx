@@ -111,7 +111,9 @@ function Navigation() {
   };
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [locationErrorSnackbar, setLocationErrorSnackbar] = useState(false); // New state
+  const [locationErrorSnackbar, setLocationErrorSnackbar] = useState(false);
+  const [destinationErrorSnackbar, setDestinationErrorSnackbar] =
+    useState(false);
 
   const handleFindNearMe = () => {
     if (userLocation) {
@@ -119,11 +121,23 @@ function Navigation() {
       console.log("Triggering find carparks near:", lat, lon);
       findCarparks(lat, lon);
       setOpenSnackbar(true);
+      setLocationErrorSnackbar(false); // Reset location error
     } else {
       console.error(
         "User location not available. Please allow location access.",
       );
-      setLocationErrorSnackbar(true); // Trigger error snackbar
+      setLocationErrorSnackbar(true); // Trigger location error
+    }
+  };
+
+  const handleOpenGmaps = () => {
+    if (endPoint) {
+      const [lon, lat] = endPoint;
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+      window.open(googleMapsUrl, "_blank"); // Open Google Maps in a new tab
+      setDestinationErrorSnackbar(false); // Reset destination error if valid endpoint
+    } else {
+      setDestinationErrorSnackbar(true); // Trigger destination error if no destination
     }
   };
 
@@ -132,18 +146,8 @@ function Navigation() {
       return;
     }
     setOpenSnackbar(false);
-    setLocationErrorSnackbar(false); // Close error snackbar
-  };
-
-  // Function to handle opening Google Maps
-  const handleOpenGmaps = () => {
-    if (endPoint) {
-      const [lon, lat] = endPoint;
-      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
-      window.open(googleMapsUrl, "_blank"); // Open Google Maps in a new tab
-    } else {
-      setLocationErrorSnackbar(true); // Trigger error snackbar if no destination
-    }
+    setLocationErrorSnackbar(false);
+    setDestinationErrorSnackbar(false);
   };
 
   useEffect(() => {
@@ -324,7 +328,7 @@ function Navigation() {
           sx={{
             position: "absolute", // Fixed the typo
             bottom: "605px", // Adjust distance from the bottom of the map container
-            left: "20px", // Adjust distance from the right of the map container
+            left: "20px",
           }}
         >
           <NavigationIcon />
@@ -333,7 +337,7 @@ function Navigation() {
 
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={3000}
+        autoHideDuration={2000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
@@ -348,8 +352,8 @@ function Navigation() {
 
       {/* Error Snackbar */}
       <Snackbar
-        open={locationErrorSnackbar} // Tied to error state
-        autoHideDuration={3000}
+        open={locationErrorSnackbar} // Location error
+        autoHideDuration={2000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
@@ -358,12 +362,13 @@ function Navigation() {
           severity="error"
           sx={{ width: "100%" }}
         >
-          Unable to locate position.
+          Unable to find your location.
         </Alert>
       </Snackbar>
+
       <Snackbar
-        open={locationErrorSnackbar}
-        autoHideDuration={3000}
+        open={destinationErrorSnackbar} // Destination error
+        autoHideDuration={2000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
@@ -372,9 +377,10 @@ function Navigation() {
           severity="error"
           sx={{ width: "100%" }}
         >
-          Please enter a destination
+          Please enter a destination.
         </Alert>
       </Snackbar>
+
       {carparkData && carparkData.data && (
         <div className={`carpark-popup ${!isExpanded ? "collapsed" : ""}`}>
           <CarparkHeader

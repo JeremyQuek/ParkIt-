@@ -98,7 +98,7 @@ const CarparkCard = ({ carpark, onSelect }) => {
           }}
         >
           <Typography
-            variant="subtitle1"
+            variant="subtitle2"
             component="div"
             sx={{ fontWeight: "bold" }}
           >
