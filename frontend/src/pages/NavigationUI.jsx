@@ -110,6 +110,8 @@ function Navigation() {
 
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
+  const [locationErrorSnackbar, setLocationErrorSnackbar] = useState(false); // New state
+
   const handleFindNearMe = () => {
     if (userLocation) {
       const { lat, lon } = userLocation;
@@ -120,6 +122,7 @@ function Navigation() {
       console.error(
         "User location not available. Please allow location access.",
       );
+      setLocationErrorSnackbar(true); // Trigger error snackbar
     }
   };
 
@@ -128,8 +131,8 @@ function Navigation() {
       return;
     }
     setOpenSnackbar(false);
+    setLocationErrorSnackbar(false); // Close error snackbar
   };
-
   useEffect(() => {
     if (map.current) return;
 
@@ -315,6 +318,22 @@ function Navigation() {
           sx={{ width: "100%" }}
         >
           Finding carparks near you
+        </Alert>
+      </Snackbar>
+
+      {/* Error Snackbar */}
+      <Snackbar
+        open={locationErrorSnackbar} // Tied to error state
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          Unable to locate position.
         </Alert>
       </Snackbar>
       {carparkData && carparkData.data && (
