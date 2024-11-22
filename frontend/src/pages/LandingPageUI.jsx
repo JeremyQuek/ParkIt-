@@ -11,11 +11,11 @@ function LandingPage() {
   useEffect(() => {
     const welcomeTimer = setTimeout(() => {
       setShowWelcome(true);
-    }, 500);
+    }, 800);
 
     const showTextTimer = setTimeout(() => {
       setShowClickText(true);
-    }, 2200);
+    }, 2500);
 
     return () => {
       clearTimeout(welcomeTimer);

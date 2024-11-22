@@ -1,26 +1,52 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import Divider from "@mui/material/Divider";
-import { TbHeadphones } from "react-icons/tb";
-import { RiQuestionLine } from "react-icons/ri";
-import { BiSearchAlt } from "react-icons/bi";
-import { MdPersonOutline } from "react-icons/md";
-
+import { TextField, Grid, Box, Divider } from "@mui/material";
+import { IoIosArrowBack } from "react-icons/io";
 import { IconButton } from "@mui/material";
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import "./style.css";
 
 function Account() {
-  const Liststyle = {
-    width: "100%",
-    borderColor: "divider",
-    backgroundColor: "background.paper",
+  // States to manage the form fields
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [pressedButton, setPressedButton] = useState(null);
+
+  // Handler to manage input changes
+  const handleInputChange = (event, setState) => {
+    setState(event.target.value);
   };
-  const item_style = {
-    margin: "3px 0px",
+
+  // Custom button style
+  const getButtonStyle = (buttonName) => ({
+    backgroundColor: "black",
+    color: "white",
+    width: "45%",
+    padding: "16px 16px",
+    borderRadius: "6px",
+    border: "black",
+    fontSize: "16px",
+    fontWeight: "500",
+    cursor: "pointer",
+    transition: "transform 0.2s ease, opacity 0.2s ease", // Added transition for transform
+    outline: "none",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+    margin: "8px",
+    transform: pressedButton === buttonName ? "scale(0.95)" : "scale(1)", // Handles the scale effect
+    opacity: pressedButton === buttonName ? 0.9 : 1, // Handles opacity change
+  });
+
+  // Handle button press
+  const handleButtonClick = (buttonName) => {
+    setPressedButton(buttonName);
+
+    // Simulate saving logic here, e.g., after a delay, reset the scale
+    setTimeout(() => {
+      setPressedButton(null); // Reset the button scale after a short time
+    }, 200); // Duration of the animation
   };
+
   return (
     <div className="page">
       <div
@@ -42,68 +68,74 @@ function Account() {
         >
           <IoIosArrowBack size={28} />
         </IconButton>
-        <h1>Settings</h1>
+        <h1>Account</h1>
       </div>
       <br />
-      <List sx={Liststyle} aria-label="mailbox folders">
-        <ListItem sx={item_style}>
-          <MdPersonOutline size={28} />
-          <ListItemText
-            sx={{ marginLeft: "5%" }}
-            primary="Account"
-            secondary="Manage and personalise your profile."
-          />
-          <IconButton component={Link} to="/account">
-            <IoIosArrowForward size={20} />
-          </IconButton>
-        </ListItem>
+      <div className="account-form">
+        {/* First Name and Last Name in the same row */}
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="First Name"
+              variant="outlined"
+              value={firstName}
+              onChange={(e) => handleInputChange(e, setFirstName)}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              label="Last Name"
+              variant="outlined"
+              value={lastName}
+              onChange={(e) => handleInputChange(e, setLastName)}
+            />
+          </Grid>
+        </Grid>
 
-        <Divider component="li" />
+        <Divider sx={{ margin: "20px 0" }} />
 
-        <ListItem sx={item_style}>
-          <BiSearchAlt size={25} />
-          <ListItemText
-            sx={{ marginLeft: "5%" }}
-            primary="Search Options"
-            secondary="Explore advanced search filters and options"
-          />
-          <IconButton component={Link} to="/sort">
-            <IoIosArrowForward size={20} />
-          </IconButton>
-        </ListItem>
+        {/* Email field in a separate row */}
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Email"
+              variant="outlined"
+              value={email}
+              onChange={(e) => handleInputChange(e, setEmail)}
+            />
+          </Grid>
+        </Grid>
 
-        <Divider component="li" />
+        <Divider sx={{ margin: "20px 0" }} />
 
-        <ListItem sx={item_style}>
-          <TbHeadphones size={25} />
-          <ListItemText
-            sx={{ marginLeft: "5%" }}
-            primary="Help and Support"
-            secondary="Read our project and developer docs"
-          />
-          <IconButton
-            onClick={() =>
-              window.open("https://github.com/JeremyQuek/ParkIt_App", "_blank")
-            }
+        {/* Phone number field in a separate row */}
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Phone Number"
+              variant="outlined"
+              value={phone}
+              onChange={(e) => handleInputChange(e, setPhone)}
+            />
+          </Grid>
+        </Grid>
+
+        <Divider sx={{ margin: "20px 0" }} />
+
+        {/* Custom Save Button */}
+        <Box mt={3} display="flex" justifyContent="center">
+          <button
+            style={getButtonStyle("saveChanges")}
+            onClick={() => handleButtonClick("saveChanges")}
           >
-            <IoIosArrowForward size={20} />
-          </IconButton>
-        </ListItem>
-
-        <Divider component="li" />
-
-        <ListItem sx={item_style}>
-          <RiQuestionLine size={28} />
-          <ListItemText
-            sx={{ marginLeft: "5%" }}
-            primary="About"
-            secondary="Learn more about ParkIt!"
-          />
-          <IconButton component={Link} to="/about">
-            <IoIosArrowForward size={20} />
-          </IconButton>
-        </ListItem>
-      </List>
+            Save Changes
+          </button>
+        </Box>
+      </div>
     </div>
   );
 }

@@ -306,26 +306,25 @@ function Navigation() {
         style={{ position: "relative" }}
       >
         <Fab
-          color="primary"
           onClick={handleFindNearMe}
           sx={{
             position: "absolute", // Fixed the typo
             bottom: "680px", // Adjust distance from the bottom of the map container
             left: "20px", // Adjust distance from the right of the map container
-            zIndex: 10, // Ensure it's above the map
+            color: "white",
+            background: "#292929",
           }}
         >
           <DirectionsCarFilled />
         </Fab>
 
         <Fab
-          color="secondary"
+          color="primary"
           onClick={handleOpenGmaps}
           sx={{
             position: "absolute", // Fixed the typo
-            bottom: "600px", // Adjust distance from the bottom of the map container
+            bottom: "605px", // Adjust distance from the bottom of the map container
             left: "20px", // Adjust distance from the right of the map container
-            zIndex: 10, // Ensure it's above the map
           }}
         >
           <NavigationIcon />

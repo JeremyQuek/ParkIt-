@@ -10,6 +10,7 @@ import Settings from "./pages/SettingsUI.jsx";
 import Bookmarks from "./pages/BookmarkUI.jsx";
 import SettingsMain from "./pages/SettingsMain.jsx";
 import About from "./pages/About.jsx";
+import Account from "./pages/Account.jsx";
 import "./index.css";
 
 function App() {
@@ -79,6 +80,7 @@ function App() {
             <Route path="/settings" element={<SettingsMain />} />
             <Route path="/sort" element={<Settings />} />
             <Route path="/about" element={<About />} />
+            <Route path="/account" element={<Account />} />
             <Route
               path="/home"
               element={
