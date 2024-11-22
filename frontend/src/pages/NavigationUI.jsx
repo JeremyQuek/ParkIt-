@@ -4,16 +4,20 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+
+import Fab from "@mui/material/Fab";
+
 import axios from "axios";
 import "./style.css";
 
-import { Stack, Typography, Card } from "@mui/material";
+import { Stack, Typography, Card, Snackbar, Alert } from "@mui/material";
 
 import CarparkCard from "../components/CarparkCard";
 import CarparkHeader from "../components/CarparkHeader";
 import TopBar from "../components/Topbar";
 
 import { motion } from "framer-motion";
+import { DirectionsCarFilled } from "@mui/icons-material";
 
 const backend_url = process.env.REACT_APP_BACKEND_URL;
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -29,8 +33,9 @@ function Navigation() {
   const [carparkData, setCarparkData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
-  const [visibleResults, setVisibleResults] = useState(3); // Changed to 3
+  const [visibleResults, setVisibleResults] = useState(3);
   const [userLocation, setUserLocation] = useState(null);
+  const [isUserInput, setIsUserInput] = useState(false);
 
   const findCarparks = async (lat, long) => {
     try {
@@ -48,7 +53,13 @@ function Navigation() {
       });
       console.log("Carpark data received:", response.data);
       setCarparkData(response.data);
-      setVisibleResults(3); // Reset to 3 initial results
+      setVisibleResults(3);
+
+      // Add a marker for the destination
+      if (map.current && endPoint) {
+        new mapboxgl.Marker().setLngLat(endPoint).addTo(map.current);
+      }
+
       return response.data;
     } catch (error) {
       console.error("Error:", error);
@@ -97,11 +108,14 @@ function Navigation() {
     }
   };
 
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
   const handleFindNearMe = () => {
     if (userLocation) {
       const { lat, lon } = userLocation;
       console.log("Triggering find carparks near:", lat, lon);
       findCarparks(lat, lon);
+      setOpenSnackbar(true);
     } else {
       console.error(
         "User location not available. Please allow location access.",
@@ -109,7 +123,12 @@ function Navigation() {
     }
   };
 
-  const [isUserInput, setIsUserInput] = useState(false);
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpenSnackbar(false);
+  };
 
   useEffect(() => {
     if (map.current) return;
@@ -117,7 +136,7 @@ function Navigation() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/streets-v11",
-      center: [103.8198, 1.3521],
+      center: state?.coordinates || [103.8198, 1.3521],
       zoom: 11,
     });
 
@@ -139,9 +158,23 @@ function Navigation() {
     map.current.addControl(geolocate);
     map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-    map.current.on("load", () => {
-      geolocate.trigger();
-    });
+    // If coming from bookmarks with coordinates, trigger find carparks and fly to location
+    if (state?.coordinates) {
+      const [lon, lat] = state.coordinates;
+      findCarparks(lat, lon);
+
+      map.current.on("load", () => {
+        map.current.flyTo({
+          center: state.coordinates,
+          zoom: 15,
+          essential: true,
+        });
+      });
+    } else {
+      map.current.on("load", () => {
+        geolocate.trigger();
+      });
+    }
 
     geolocate.on("geolocate", (e) => {
       const lon = e.coords.longitude;
@@ -149,22 +182,17 @@ function Navigation() {
       console.log("Geolocation result:", { lat, lon });
       setStartPoint([lon, lat]);
       setUserLocation({ lat, lon });
-
-      // Trigger findCarparks only if no user input
-      if (!isUserInput) {
-        findCarparks(lat, lon);
-      }
     });
 
     geocoder.on("result", (e) => {
       const [longitude, latitude] = e.result.center;
       console.log("User search route result:", { longitude, latitude });
 
-      setIsUserInput(true); // Block geolocation-triggered carpark finding
+      setIsUserInput(true);
       setEndPoint([longitude, latitude]);
       findCarparks(latitude, longitude);
     });
-  }, [isUserInput]);
+  }, [isUserInput, state]);
 
   useEffect(() => {
     const fetchRoute = async () => {
@@ -259,8 +287,33 @@ function Navigation() {
           delay: 0.2,
           ease: "easeOut",
         }}
+        style={{ position: "relative" }}
       />
+      <Fab
+        color="primary"
+        onClick={handleFindNearMe}
+        sx={{
+          bottom: "730px", // Adjust distance from the bottom of the map container
+          right: "-25px", // Adjust distance from the right of the map container
+        }}
+      >
+        <DirectionsCarFilled />
+      </Fab>
 
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="info"
+          sx={{ width: "100%" }}
+        >
+          Finding carparks at your location
+        </Alert>
+      </Snackbar>
       {carparkData && carparkData.data && (
         <div className={`carpark-popup ${!isExpanded ? "collapsed" : ""}`}>
           <CarparkHeader

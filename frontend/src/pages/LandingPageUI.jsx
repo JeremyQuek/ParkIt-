@@ -11,11 +11,11 @@ function LandingPage() {
   useEffect(() => {
     const welcomeTimer = setTimeout(() => {
       setShowWelcome(true);
-    }, 1000);
+    }, 500);
 
     const showTextTimer = setTimeout(() => {
       setShowClickText(true);
-    }, 3000);
+    }, 2200);
 
     return () => {
       clearTimeout(welcomeTimer);
@@ -31,9 +31,9 @@ function LandingPage() {
     <div className="page" onClick={handleClickAnywhere}>
       {showWelcome && (
         <motion.div
-          initial={{ opacity: 0, y: 50, x: "-50%" }}
+          initial={{ opacity: 0, y: 30, x: "-50%" }}
           animate={{ opacity: 1, y: 0, x: "-50%" }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
+          transition={{ duration: 1.2, ease: "easeInOut" }}
           style={{
             position: "fixed",
             bottom: "65%",
@@ -45,19 +45,6 @@ function LandingPage() {
           <h1 style={{ color: "black" }}>Welcome Back!</h1>
           <h2 style={{ color: "black" }}>Ready to travel?</h2>
         </motion.div>
-        // <motion.div
-        //   initial={{ opacity: 0 }}
-        //   animate={{ opacity: 1 }}
-        //   style={{
-        //     position: "absolute",
-        //     bottom: "65%",
-        //     left: "50%",
-        //     textAlign: "center",
-        //   }}
-        // >
-        //   <h1 style={{ color: "black" }}>Welcome Back!</h1>
-        //   <h2 style={{ color: "black" }}>Ready to travel?</h2>
-        // </motion.div>
       )}
 
       {/* Static logo, no animation */}

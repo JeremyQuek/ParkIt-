@@ -18,6 +18,7 @@
     "framer-motion": "^10.18.0",
     "lottie-react": "^2.4.0",
     "lottie-web": "^5.12.2",
+    "lucide-react": "^0.460.0",
     "mapbox-gl": "^2.15.0",
     "react": "^18.3.1",
     "react-cookie": "^7.2.1",

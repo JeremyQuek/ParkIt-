@@ -126,7 +126,7 @@ function Settings() {
       >
         <IconButton
           component={Link}
-          to="/navigation"
+          to="/settings"
           edge="start"
           color="inherit"
           aria-label="back"
@@ -137,40 +137,8 @@ function Settings() {
         >
           <IoIosArrowBack size={28} />
         </IconButton>
-        <h1>Settings</h1>
+        <h1>Filters</h1>
       </div>
-
-      <div className="setting-box">
-        <h3>Select your vehicle type</h3>
-        <div className="settings-icon-box" style={{ marginTop: "35px" }}>
-          <div
-            className={`settings-icon-circle ${vehicleType === "car" ? "selected-vehicle" : ""}`}
-            onClick={() => handleVehicleSelect("car")}
-            style={{ marginLeft: "20%" }}
-          >
-            <FaCar size={35} color="white" />
-          </div>
-
-          <div
-            className={`settings-icon-circle ${vehicleType === "motorcycle" ? "selected-vehicle" : ""}`}
-            onClick={() => handleVehicleSelect("motorcycle")}
-            style={{ marginLeft: "25%" }}
-          >
-            <FaMotorcycle size={35} color="white" />
-          </div>
-        </div>
-        <div
-          style={{
-            textAlign: "center",
-            marginTop: "35px",
-            fontSize: "1.0rem",
-            color: "#666",
-          }}
-        >
-          Selected: {vehicleType === "car" ? "Car" : "Motorcycle"}
-        </div>
-      </div>
-
       <div className="setting-box">
         <h3> Customise your search priority</h3>
 
@@ -211,6 +179,36 @@ function Settings() {
             {sortDescriptions[selectedOption]}
           </div>
         )}
+      </div>
+      <div className="setting-box">
+        <h3>Select your vehicle type</h3>
+        <div className="settings-icon-box" style={{ marginTop: "35px" }}>
+          <div
+            className={`settings-icon-circle ${vehicleType === "car" ? "selected-vehicle" : ""}`}
+            onClick={() => handleVehicleSelect("car")}
+            style={{ marginLeft: "20%" }}
+          >
+            <FaCar size={35} color="white" />
+          </div>
+
+          <div
+            className={`settings-icon-circle ${vehicleType === "motorcycle" ? "selected-vehicle" : ""}`}
+            onClick={() => handleVehicleSelect("motorcycle")}
+            style={{ marginLeft: "25%" }}
+          >
+            <FaMotorcycle size={35} color="white" />
+          </div>
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "35px",
+            fontSize: "1.0rem",
+            color: "#666",
+          }}
+        >
+          Selected: {vehicleType === "car" ? "Car" : "Motorcycle"}
+        </div>
       </div>
 
       <div className="setting-box">
