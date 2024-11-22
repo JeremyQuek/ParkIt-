@@ -288,17 +288,20 @@ function Navigation() {
           ease: "easeOut",
         }}
         style={{ position: "relative" }}
-      />
-      <Fab
-        color="primary"
-        onClick={handleFindNearMe}
-        sx={{
-          bottom: "730px", // Adjust distance from the bottom of the map container
-          right: "-25px", // Adjust distance from the right of the map container
-        }}
       >
-        <DirectionsCarFilled />
-      </Fab>
+        <Fab
+          color="primary"
+          onClick={handleFindNearMe}
+          sx={{
+            position: "absolute", // Fixed the typo
+            bottom: "680px", // Adjust distance from the bottom of the map container
+            left: "20px", // Adjust distance from the right of the map container
+            zIndex: 10, // Ensure it's above the map
+          }}
+        >
+          <DirectionsCarFilled />
+        </Fab>
+      </motion.div>
 
       <Snackbar
         open={openSnackbar}
@@ -311,7 +314,7 @@ function Navigation() {
           severity="info"
           sx={{ width: "100%" }}
         >
-          Finding carparks at your location
+          Finding carparks near you
         </Alert>
       </Snackbar>
       {carparkData && carparkData.data && (

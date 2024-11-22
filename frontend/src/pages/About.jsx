@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import { Car, Calendar, MapPin } from "lucide-react";
-import { IconButton, Button, Box, Snackbar } from "@mui/material";
+import { IconButton, Divider, Snackbar } from "@mui/material";
 import * as React from "react";
 function About() {
   const features = [
@@ -149,6 +149,11 @@ function About() {
         </div>
       </div>
       <br />
+      <br />
+      <br />
+      <br />
+      <Divider />
+
       <p
         style={{
           textAlign: "left",
@@ -161,7 +166,8 @@ function About() {
       </p>
       <br />
       <br />
-
+      <br />
+      <br />
       <div style={{ flex: "column", textAlign: "left" }}>
         <button
           style={getButtonStyle("like")}
@@ -189,6 +195,15 @@ function About() {
         >
           Docs
         </button>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+
         <p style={{ color: "white" }}> hi </p>
         <Snackbar
           anchorOrigin={{ vertical, horizontal }}
