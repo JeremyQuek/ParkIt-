@@ -6,7 +6,7 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import Navigation from "./pages/NavigationUI.jsx";
 import LandingPage from "./pages/LandingPageUI.jsx";
-import Filter from "./pages/Filter.jsx";
+import Filter from "./pages/FilterUI.jsx";
 import Bookmarks from "./pages/BookmarkUI.jsx";
 import Settings from "./pages/SettingsMain.jsx";
 import About from "./pages/About.jsx";
