@@ -6,9 +6,9 @@ import axios from "axios";
 import { useCookies } from "react-cookie";
 import Navigation from "./pages/NavigationUI.jsx";
 import LandingPage from "./pages/LandingPageUI.jsx";
-import Settings from "./pages/SettingsUI.jsx";
+import Filter from "./pages/Filter.jsx";
 import Bookmarks from "./pages/BookmarkUI.jsx";
-import SettingsMain from "./pages/SettingsMain.jsx";
+import Settings from "./pages/SettingsMain.jsx";
 import About from "./pages/About.jsx";
 import Account from "./pages/Account.jsx";
 import "./index.css";
@@ -77,8 +77,8 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/navigation" element={<Navigation />} />
             <Route path="/bookmarks" element={<Bookmarks />} />
-            <Route path="/settings" element={<SettingsMain />} />
-            <Route path="/sort" element={<Settings />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/filter" element={<Filter />} />
             <Route path="/about" element={<About />} />
             <Route path="/account" element={<Account />} />
             <Route
