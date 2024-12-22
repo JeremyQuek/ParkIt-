@@ -11,6 +11,7 @@ import Bookmarks from "./pages/BookmarkUI.jsx";
 import Settings from "./pages/SettingsMain.jsx";
 import About from "./pages/About.jsx";
 import Account from "./pages/Account.jsx";
+import Test from "./pages/test.jsx";
 import "./index.css";
 
 function App() {
@@ -81,6 +82,7 @@ function App() {
             <Route path="/filter" element={<Filter />} />
             <Route path="/about" element={<About />} />
             <Route path="/account" element={<Account />} />
+            <Route path="/test" element={<Test />} />
             <Route
               path="/home"
               element={
